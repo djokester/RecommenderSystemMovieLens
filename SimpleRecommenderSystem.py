@@ -1,7 +1,14 @@
+ lines (44 sloc)  1.96 KB
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Dec 24 22:57:52 2016
+@author: djokester
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 
 #column headers for the dataset
 data_cols = ['user id','movie id','rating','timestamp']
@@ -13,75 +20,38 @@ users = pd.read_csv('Desktop/ml-100k/u.user', sep='|', names=user_cols, encoding
 item = pd.read_csv('Desktop/ml-100k/u.item', sep='|', names=item_cols, encoding='latin-1')
 data = pd.read_csv('Desktop/ml-100k/u.data', sep='\t', names=data_cols, encoding='latin-1')
 
-utrain = (data.sort_values('user id'))[:99832]
-print(utrain.tail())
-utest = (data.sort_values('user id'))[99833:]
-print(utest.head())
+#printing the head of these dataframes()
+print("Users Head")
+print(users.head())
+print("\nItems Head")
+print(item.head())
+print("\nData Head")
+print(data.head())
 
-utrain = utrain.as_matrix(columns = ['user id', 'movie id', 'rating'])
-print(utrain)
+#printing the details of these dataframes() 
+print('\n',users.info())
+print('\n',item.info())
+print('\n',data.info())
 
-utest = utest.as_matrix(columns = ['user id', 'movie id', 'rating'])
-print(utest)
+#Using Pandas to manipulate the data 
 
-users_list = []
-for i in range(1,943):
-    list = []
-    for j in range(0,len(utrain)):
-        if utrain[j][0] == i:
-            list.append(utrain[j])    
-        else:
-            break
-    utrain = utrain[j:]
-    users_list.append(list) 
-    
-print(len(users_list))
+#Create one data frame from the three
+dataset = pd.merge(pd.merge(item, data),users)
+print(dataset.head())
 
+#Create dataframes with mean rating and total number of ratings
+ratings_total = dataset.groupby('movie title').size()
 
-def EucledianScore(train_user, test_user):
-    sum = 0
-    count = 0
-    for i in test_user:
-        score = 0
-        for j in train_user:
-            if(int(i[1]) == int(j[1])):
-                score= ((float(i[2])-float(j[2]))*(float(i[2])-float(j[2])))
-                count= count + 1        
-            sum = sum + score
-    if(count<4):
-        sum = 1000000           
-    return([math.sqrt(sum),count])            
+rt = (dataset.groupby('movie title'))['movie title','rating']
+ratings_mean = (rt.mean())
 
-score_list = []               
-for i in range(0,942):
-    score_list.append([i+1,EucledianScore(users_list[i], utest)])
-    
-print(score_list)
-score = pd.DataFrame(score_list, columns = ['user id','Eucledian Score'])
-score = score.sort_values(by = 'Eucledian Score')
+#modify those dataframes so that we can merge the two 
+ratings_total = pd.DataFrame({'movie title':ratings_total.index, 'total ratings': ratings_total.values})
+ratings_mean['movie title'] = ratings_mean.index
 
-print(score)
-score_matrix = score.as_matrix()
+final = pd.merge(ratings_mean, ratings_total).sort_values(by = 'total ratings', ascending= False)
+print(final.head())
+print(final.describe())
 
-user= int(score_matrix[0][0])
-
-movies_list = []
-full_list = []
-for i in utest:
-    for j in users_list[user-1]:
-        if(int(i[1])== int(j[1])):
-            movies_list.append(int(j[1]))
-        full_list.append(j[1])
-
-movies_list = set(movies_list)  
-full_list = set(full_list)
-
-print(full_list.difference(movies_list))
-recommendation = full_list.difference(movies_list)
-item_list = item.sort_values(by = 'movie id').as_matrix()
-print(item_list)
-
-for i in recommendation:
-    print(item_list[i-1])
-
-
+final = final[:300].sort_values(by = 'rating', ascending = False)
+print(final.head())
