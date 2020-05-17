@@ -26,16 +26,16 @@ The dataset can be found at [MovieLens 100k Dataset](http://grouplens.org/datase
               user id | age | gender | occupation | zip code
               The user ids are the ones used in the u.data data set.
 
-##Requirements 
+## Requirements 
 1. Numpy
 2. Pandas
 3. Scipy 
 4. Matplotlib
 
-#Simple Recommender System
+# Simple Recommender System
 This is a very simple SQL-like manipulation of the datasets using Pandas. For a detailed guide on how to create such a recommender system visit this [Link](https://acodeforthought.wordpress.com/2016/12/26/building-a-simple-recommender-system-with-movie-lens-data-set/  "Blog Post on Simple Rcommender Systems").
 
-#Recommender System Based on User-Based Collaborative Filtering
+# Recommender System Based on User-Based Collaborative Filtering
 We used only two of the three data files in this one; u.data and u.item. We used Eucledian Distance as a measure of similarity between users. 
 In case two users have less than 4 movies in common they were automatically assigned a high EucledianScore. Otherwise EuclediaScore was calculated as the square root of the sum of squares of the difference in ratings of the movies that the users have in common. For more information about this program visit this [Link](https://acodeforthought.wordpress.com/2016/12/29/building-a-recommender-system-on-user-user-collaborative-filtering-movielens-dataset/ "Blog poston Recommender System on User-User Collaborative Filtering")
 
